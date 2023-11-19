@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
-using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations;
 
 namespace BugTrackingSystem.Models.Entities;
 
@@ -7,10 +7,12 @@ namespace BugTrackingSystem.Models.Entities;
 public class ApplicationUser : IdentityUser
 {
     [PersonalData]
-    [Column(TypeName = "nvarchar(100)")]
+    [Required(ErrorMessage = "First Name is required.")]
+    [MaxLength(32, ErrorMessage = "First Name cannot exceed 32 characters.")]
     public string FirstName { get; set; }
 
     [PersonalData]
-    [Column(TypeName = "nvarchar(100)")]
+    [Required(ErrorMessage = "Last Name is required.")]
+    [MaxLength(32, ErrorMessage = "Last Name cannot exceed 32 characters.")]
     public string LastName { get; set; }
 }

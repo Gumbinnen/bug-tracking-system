@@ -20,7 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Areas\DB\" />
+    <Folder Include="Database\Volume\" />
   </ItemGroup>
 
 </Project>

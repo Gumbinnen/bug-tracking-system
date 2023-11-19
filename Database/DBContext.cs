@@ -1,14 +1,5 @@
-﻿using BugTrackingSystem.Models.Entities.ApplicationUser;
-using BugTrackingSystem.Models.Entities.Bug;
-using BugTrackingSystem.Models.Entities.Permission;
-using BugTrackingSystem.Models.Entities.PersonalSpace;
-using BugTrackingSystem.Models.Entities.Priority;
-using BugTrackingSystem.Models.Entities.Project;
-using BugTrackingSystem.Models.Entities.Role;
-using BugTrackingSystem.Models.Entities.Severity;
-using BugTrackingSystem.Models.Entities.Status;
-using BugTrackingSystem.Models.LinkingEntities.RolePermission;
-using BugTrackingSystem.Models.LinkingEntities.UserRole;
+﻿using BugTrackingSystem.Models.Entities;
+using BugTrackingSystem.Models.LinkingEntities;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
@@ -18,7 +9,7 @@ public class DBContext : IdentityDbContext<ApplicationUser>
 {
     public DbSet<PersonalSpace> PersonalSpaces { get; set; }
     public DbSet<Project> Projects { get; set; }
-    public new DbSet<Role> Roles { get; set; } // TODO: use of "new" operator is unnecessery?
+    public new DbSet<Role> Roles { get; set; }
     public DbSet<Permission> Permissions { get; set; }
     public DbSet<Bug> Bugs { get; set; }
     public DbSet<Priority> Priorities { get; set; }
