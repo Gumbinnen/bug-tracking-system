@@ -1,11 +1,12 @@
 using Microsoft.AspNetCore.Identity;
-using BugTrackingSystem.Areas.Identity.Data;
 using Microsoft.EntityFrameworkCore;
-using BugTrackingSystem.Data;
-var builder = WebApplication.CreateBuilder(args);
-var connectionString = builder.Configuration.GetConnectionString("DBContextConnection") ?? throw new InvalidOperationException("Connection string 'DBContextConnection' not found.");
+using BugTrackingSystem.Database;
+using BugTrackingSystem.Models.Entities.ApplicationUser;
 
-builder.Services.AddDbContext<DBContext>(options => options.UseSqlServer(connectionString));
+var builder = WebApplication.CreateBuilder(args);
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DBContextConnection' not found.");
+
+builder.Services.AddDbContext<DBContext>(options => options.UseNpgsql(connectionString));
 
 builder.Services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = true).AddEntityFrameworkStores<DBContext>();
 
