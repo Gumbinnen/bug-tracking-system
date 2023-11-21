@@ -5,28 +5,27 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BugTrackingSystem.Models.Entities
 {
-    public class Role : IdentityRole
+    public class ApplicationRole : IdentityRole
     {
         [MaxLength(4000, ErrorMessage = "Description cannot exceed 4000 characters.")]
         public string? Description { get; set; }
 
         [Required(ErrorMessage = "Created User ID is required.")]
-        [ForeignKey(nameof(ApplicationUser))]
-        public int CreatedUserID { get; set; }
+        public string CreatedUserId { get; set; }
 
         [Required(ErrorMessage = "Created Project ID is required.")]
-        [ForeignKey(nameof(Project))]
-        public int CreatedProjectID { get; set; }
+        public string CreatedProjectId { get; set; }
 
         [Required(ErrorMessage = "Created User is required.")]
+
+        // Navigation properties
+        [ForeignKey(nameof(CreatedUserId))]
         public ApplicationUser CreatedUser { get; set; }
 
         [Required(ErrorMessage = "Created Project is required.")]
+        [ForeignKey(nameof(CreatedProjectId))]
         public Project CreatedProject { get; set; }
-
-        // Navigation properties
-        public List<UserRole> UserRoles { get; set; }
-
+        public List<ApplicationUserRole> UserRoles { get; set; }
         public List<RolePermission> RolePermissions { get; set; }
     }
 }

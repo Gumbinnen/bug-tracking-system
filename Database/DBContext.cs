@@ -1,22 +1,23 @@
 ﻿using BugTrackingSystem.Models.Entities;
 using BugTrackingSystem.Models.LinkingEntities;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace BugTrackingSystem.Database;
 
-public class DBContext : IdentityDbContext<ApplicationUser>
+public class DBContext : IdentityDbContext<ApplicationUser, ApplicationRole, string,
+                                                              IdentityUserClaim<string>, ApplicationUserRole, IdentityUserLogin<string>,
+                                                              IdentityRoleClaim<string>, IdentityUserToken<string>>
 {
     public DbSet<PersonalSpace> PersonalSpaces { get; set; }
     public DbSet<Project> Projects { get; set; }
-    public new DbSet<Role> Roles { get; set; }
     public DbSet<Permission> Permissions { get; set; }
     public DbSet<Bug> Bugs { get; set; }
     public DbSet<Priority> Priorities { get; set; }
     public DbSet<Severity> Severity { get; set; }
     public DbSet<Status> Statuses { get; set; }
     public DbSet<RolePermission> PermissionRoles { get; set; }
-    public new DbSet<UserRole> UserRoles { get; set; }
     public DBContext(DbContextOptions<DBContext> options)
         : base(options)
     {

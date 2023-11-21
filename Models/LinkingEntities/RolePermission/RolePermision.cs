@@ -7,21 +7,19 @@ namespace BugTrackingSystem.Models.LinkingEntities
     public class RolePermission
     {
         [Key]
-        public int Id { get; set; }
+        public string Id { get; set; }
 
-        [Required(ErrorMessage = "Role ID is required.")]
-        [ForeignKey(nameof(Role))]
-        public int RoleID { get; set; }
-
-        [Required(ErrorMessage = "Permission ID is required.")]
-        [ForeignKey(nameof(Permission))]
-        public int PermissionID { get; set; }
-
-        // Navigation properties
         [Required(ErrorMessage = "Role is required.")]
-        public Role Role { get; set; }
+        public string RoleId { get; set; }
 
         [Required(ErrorMessage = "Permission is required.")]
+        public string PermissionId { get; set; }
+
+        // Navigation properties
+        [ForeignKey(nameof(RoleId))]
+        public ApplicationRole Role { get; set; }
+
+        [ForeignKey(nameof(PermissionId))]
         public Permission Permission { get; set; }
     }
 }

@@ -6,7 +6,7 @@ namespace BugTrackingSystem.Models.Entities
     public class Bug
     {
         [Key]
-        public int Id { get; set; }
+        public string Id { get; set; }
 
         [Required(ErrorMessage = "Title is required.")]
         [MaxLength(256, ErrorMessage = "Title cannot exceed 256 characters.")]
@@ -16,23 +16,18 @@ namespace BugTrackingSystem.Models.Entities
         public string? Description { get; set; }
 
         [Required(ErrorMessage = "Status is required.")]
-        [ForeignKey(nameof(Status))]
-        public int StatusID { get; set; }
+        public string StatusId { get; set; }
 
         [Required(ErrorMessage = "Severity is required.")]
-        [ForeignKey(nameof(Severity))]
-        public int SeverityID { get; set; }
+        public string SeverityId { get; set; }
 
         [Required(ErrorMessage = "Priority is required.")]
-        [ForeignKey(nameof(Priority))]
-        public int PriorityID { get; set; }
+        public string PriorityId { get; set; }
 
         [Required(ErrorMessage = "Reporter is required.")]
-        [ForeignKey(nameof(ApplicationUser))]
-        public int ReporterID { get; set; }
+        public string ReporterId { get; set; }
 
-        [ForeignKey(nameof(ApplicationUser))]
-        public int? AssignedToID { get; set; }
+        public string? AssignedToId { get; set; }
 
         [Required(ErrorMessage = "Created Date is required.")]
         [DataType(DataType.DateTime)]
@@ -43,8 +38,7 @@ namespace BugTrackingSystem.Models.Entities
         public DateTimeOffset ModifiedDate { get; set; }
 
         [Required(ErrorMessage = "Project is required.")]
-        [ForeignKey(nameof(Project))]
-        public int ProjectID { get; set; }
+        public string ProjectId { get; set; }
 
         [MaxLength(32, ErrorMessage = "Version cannot exceed 32 characters.")]
         public string? Version { get; set; }
@@ -55,17 +49,16 @@ namespace BugTrackingSystem.Models.Entities
 
         // Navigation properties
         public Status Status { get; set; }
-
         public Severity Severity { get; set; }
-
         public Priority Priority { get; set; }
 
-        [Required(ErrorMessage = "Reporter is required.")]
+        [ForeignKey(nameof(ReporterId))]
         public ApplicationUser Reporter { get; set; }
 
+        [ForeignKey(nameof(AssignedToId))]
         public ApplicationUser? AssignedTo { get; set; }
 
-        [Required(ErrorMessage = "Project is required.")]
+        [ForeignKey(nameof(ProjectId))]
         public Project Project { get; set; }
     }
 }

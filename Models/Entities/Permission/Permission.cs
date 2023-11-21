@@ -5,7 +5,7 @@ namespace BugTrackingSystem.Models.Entities
     public class Permission
     {
         [Key]
-        public int Id { get; set; }
+        public string Id { get; set; }
 
         [Required(ErrorMessage = "Name is required.")]
         [StringLength(256, ErrorMessage = "Name cannot exceed 256 characters.")]

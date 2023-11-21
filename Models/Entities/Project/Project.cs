@@ -9,11 +9,10 @@ namespace BugTrackingSystem.Models.Entities
     public class Project
     {
         [Key]
-        public int Id { get; set; }
+        public string Id { get; set; }
 
         [Required(ErrorMessage = "Personal Space ID is required.")]
-        [ForeignKey(nameof(PersonalSpace))]
-        public int PersonalSpaceID { get; set; }
+        public string PersonalSpaceId { get; set; }
 
         [Required(ErrorMessage = "Project Name is required.")]
         [MaxLength(256, ErrorMessage = "Project Name cannot exceed 256 characters.")]
@@ -21,16 +20,14 @@ namespace BugTrackingSystem.Models.Entities
 
         [Required(ErrorMessage = "Description is required.")]
         [MaxLength(4000, ErrorMessage = "Description cannot exceed 4000 characters.")]
-        public string Description { get; set; }
+        public string? Description { get; set; }
 
         // Navigation properties
         [Required(ErrorMessage = "Personal Space is required.")]
+        [ForeignKey(nameof(PersonalSpaceId))]
         public PersonalSpace PersonalSpace { get; set; }
-
         public List<Bug> Bugs { get; set; }
-
-        public List<UserRole> UserRoles { get; set; }
-
-        public List<Role> CreatedRoles { get; set; }
+        public List<ApplicationUserRole> UserRoles { get; set; }
+        public List<ApplicationRole> CreatedRoles { get; set; }
     }
 }
