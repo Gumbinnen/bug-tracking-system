@@ -1,4 +1,5 @@
-﻿using BugTrackingSystem.Models.LinkingEntities;
+﻿using BugTrackingSystem.Helpers;
+using BugTrackingSystem.Models.LinkingEntities;
 using Microsoft.AspNetCore.Identity;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -27,5 +28,10 @@ namespace BugTrackingSystem.Models.Entities
         public Project CreatedProject { get; set; }
         public List<ApplicationUserRole> UserRoles { get; set; }
         public List<RolePermission> RolePermissions { get; set; }
+
+        public ApplicationRole()
+        {
+            Id = HashGenerator.GenerateRandomHash();
+        }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using BugTrackingSystem.Helpers;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BugTrackingSystem.Models.Entities
@@ -6,7 +7,7 @@ namespace BugTrackingSystem.Models.Entities
     public class Bug
     {
         [Key]
-        public string Id { get; set; }
+        public string Id { get; private set; }
 
         [Required(ErrorMessage = "Title is required.")]
         [MaxLength(256, ErrorMessage = "Title cannot exceed 256 characters.")]
@@ -60,5 +61,10 @@ namespace BugTrackingSystem.Models.Entities
 
         [ForeignKey(nameof(ProjectId))]
         public Project Project { get; set; }
+
+        public Bug()
+        {
+            Id = HashGenerator.GenerateRandomHash();
+        }
     }
 }

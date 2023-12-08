@@ -1,7 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Data;
-using BugTrackingSystem.Models.Entities;
+using BugTrackingSystem.Helpers;
 using BugTrackingSystem.Models.LinkingEntities;
 
 namespace BugTrackingSystem.Models.Entities
@@ -9,7 +8,7 @@ namespace BugTrackingSystem.Models.Entities
     public class Project
     {
         [Key]
-        public string Id { get; set; }
+        public string Id { get; private set; }
 
         [Required(ErrorMessage = "Personal Space ID is required.")]
         public string PersonalSpaceId { get; set; }
@@ -29,5 +28,10 @@ namespace BugTrackingSystem.Models.Entities
         public List<Bug> Bugs { get; set; }
         public List<ApplicationUserRole> UserRoles { get; set; }
         public List<ApplicationRole> CreatedRoles { get; set; }
+
+        public Project()
+        {
+            Id = HashGenerator.GenerateRandomHash();
+        }
     }
 }

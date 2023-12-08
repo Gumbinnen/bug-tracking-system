@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using BugTrackingSystem.Helpers;
+using Microsoft.AspNetCore.Identity;
 using System.ComponentModel.DataAnnotations;
 
 namespace BugTrackingSystem.Models.Entities;
@@ -15,4 +16,9 @@ public class ApplicationUser : IdentityUser
     [Required(ErrorMessage = "Last Name is required.")]
     [MaxLength(32, ErrorMessage = "Last Name cannot exceed 32 characters.")]
     public string LastName { get; set; }
+
+    public ApplicationUser()
+    {
+        Id = HashGenerator.GenerateRandomHash();
+    }
 }
