@@ -15,7 +15,7 @@ namespace BugTrackingSystem.Models.Entities
 
         [Required(ErrorMessage = "Project Name is required.")]
         [MaxLength(256, ErrorMessage = "Project Name cannot exceed 256 characters.")]
-        public string ProjectName { get; set; }
+        public string Name { get; set; }
 
         [Required(ErrorMessage = "Description is required.")]
         [MaxLength(4000, ErrorMessage = "Description cannot exceed 4000 characters.")]
@@ -26,12 +26,24 @@ namespace BugTrackingSystem.Models.Entities
         [ForeignKey(nameof(PersonalSpaceId))]
         public PersonalSpace PersonalSpace { get; set; }
         public List<Bug> Bugs { get; set; }
-        public List<ApplicationUserRole> UserRoles { get; set; }
+        public List<ApplicationProjectUserRole> ProjectUserRoles { get; set; }
         public List<ApplicationRole> CreatedRoles { get; set; }
 
         public Project()
         {
             Id = HashGenerator.GenerateRandomHash();
+        }
+
+        public Project(string personalSpaceId, string name) : this()
+        {
+            PersonalSpaceId = personalSpaceId;
+            Name = name;
+        }
+        public Project(string personalSpaceId, string name, string description) : this()
+        {
+            PersonalSpaceId = personalSpaceId;
+            Name = name;
+            Description = description;
         }
     }
 }

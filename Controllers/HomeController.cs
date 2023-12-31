@@ -1,4 +1,4 @@
-﻿using BugTrackingSystem.Models.ViewModels;
+﻿using BugTrackingSystem.ViewModels.ErrorViewModel;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 

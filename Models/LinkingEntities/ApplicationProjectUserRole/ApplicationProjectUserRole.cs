@@ -5,23 +5,28 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BugTrackingSystem.Models.LinkingEntities
 {
-    public class ApplicationUserRole : IdentityUserRole<string>
+    public class ApplicationProjectUserRole : IdentityUserRole<string>
     {
         [Required(ErrorMessage = "Project ID is required.")]
         public string ProjectId { get; set; }
 
-        [Required(ErrorMessage = "Created By User ID is required.")]
-        public string CreatedByUserId { get; set; }
-
         // Navigation properties
         [Required(ErrorMessage = "User is required.")]
-        public ApplicationUser ApplicationUser { get; set; }
+        public ApplicationUser User { get; set; }
+
+        [Required(ErrorMessage = "Role is required.")]
+        public ApplicationRole Role { get; set; }
 
         [Required(ErrorMessage = "Project is required.")]
         public Project Project { get; set; }
 
-        [Required(ErrorMessage = "Created By User is required.")]
-        [ForeignKey(nameof(CreatedByUserId))]
-        public ApplicationUser CreatedByUser { get; set; }
+        public ApplicationProjectUserRole()
+        { }
+        public ApplicationProjectUserRole(string projectId, string userId, string roleId)
+        {
+            this.ProjectId = projectId;
+            this.UserId = userId;
+            this.RoleId = roleId;
+        }
     }
 }

@@ -7,9 +7,6 @@ namespace BugTrackingSystem.Models.LinkingEntities
 {
     public class RolePermission
     {
-        [Key]
-        public string Id { get; private set; }
-
         [Required(ErrorMessage = "Role is required.")]
         public string RoleId { get; set; }
 
@@ -25,7 +22,12 @@ namespace BugTrackingSystem.Models.LinkingEntities
 
         public RolePermission()
         {
-            Id = HashGenerator.GenerateRandomHash();
+        }
+
+        public RolePermission(string roleId, string permissionId) : this()
+        {
+            this.RoleId = roleId;
+            this.PermissionId = permissionId;
         }
     }
 }

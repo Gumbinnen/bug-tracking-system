@@ -1,4 +1,5 @@
 ﻿using BugTrackingSystem.Helpers;
+using BugTrackingSystem.Models.LinkingEntities.AssignBugToUser;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -28,11 +29,9 @@ namespace BugTrackingSystem.Models.Entities
         [Required(ErrorMessage = "Reporter is required.")]
         public string ReporterId { get; set; }
 
-        public string? AssignedToId { get; set; }
-
         [Required(ErrorMessage = "Created Date is required.")]
         [DataType(DataType.DateTime)]
-        public DateTimeOffset CreatedDate { get; set; }
+        public DateTimeOffset CreatedDate { get; set; } = DateTimeOffset.Now;
 
         [Required(ErrorMessage = "Modified Date is required.")]
         [DataType(DataType.DateTime)]
@@ -44,9 +43,8 @@ namespace BugTrackingSystem.Models.Entities
         [MaxLength(32, ErrorMessage = "Version cannot exceed 32 characters.")]
         public string? Version { get; set; }
 
-        [Required(ErrorMessage = "Due Date is required.")]
         [DataType(DataType.DateTime)]
-        public DateTimeOffset DueDate { get; set; }
+        public DateTimeOffset? DueDate { get; set; }
 
         // Navigation properties
         public Status Status { get; set; }
@@ -56,11 +54,9 @@ namespace BugTrackingSystem.Models.Entities
         [ForeignKey(nameof(ReporterId))]
         public ApplicationUser Reporter { get; set; }
 
-        [ForeignKey(nameof(AssignedToId))]
-        public ApplicationUser? AssignedTo { get; set; }
-
         [ForeignKey(nameof(ProjectId))]
         public Project Project { get; set; }
+        public List<BugUserAssignation> AssignedUsers { get; set; }
 
         public Bug()
         {

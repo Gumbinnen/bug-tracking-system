@@ -14,7 +14,7 @@ namespace BugTrackingSystem.Models.Entities
 
         [Required(ErrorMessage = "Space Name is required.")]
         [MaxLength(64, ErrorMessage = "Name cannot exceed 64 characters.")]
-        public string SpaceName { get; set; }
+        public string Name { get; set; }
 
         // Navigation properties
         [Required(ErrorMessage = "User is required.")]
@@ -25,6 +25,12 @@ namespace BugTrackingSystem.Models.Entities
         public PersonalSpace()
         {
             Id = HashGenerator.GenerateRandomHash();
+        }
+
+        public PersonalSpace(string userId, string name) : this()
+        {
+            UserId = userId;
+            Name = name;
         }
     }
 }

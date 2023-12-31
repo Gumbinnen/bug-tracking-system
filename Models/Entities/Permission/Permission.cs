@@ -1,4 +1,6 @@
 ﻿using BugTrackingSystem.Helpers;
+using BugTrackingSystem.Models.LinkingEntities;
+using Microsoft.AspNetCore.Identity;
 using System.ComponentModel.DataAnnotations;
 
 namespace BugTrackingSystem.Models.Entities
@@ -12,9 +14,24 @@ namespace BugTrackingSystem.Models.Entities
         [StringLength(256, ErrorMessage = "Name cannot exceed 256 characters.")]
         public string Name { get; set; }
 
-        public Permission()
+        [Required(ErrorMessage = "NormalizedName is required.")]
+        [StringLength(256, ErrorMessage = "Name cannot exceed 256 characters.")]
+        public string NormalizedName { get; set; }
+
+        // Navigation properties
+        public List<RolePermission> RolePermissions { get; set; }
+
+        public Permission(string name)
         {
             Id = HashGenerator.GenerateRandomHash();
+            Name = name;
+            NormalizedName = NormalizeName(name)!;
         }
+
+        public static string? NormalizeName(string name)
+        {
+            return name?.Trim().ToUpperInvariant();
+        }
+
     }
 }
