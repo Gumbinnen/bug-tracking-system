@@ -3,6 +3,7 @@ using System;
 using BugTrackingSystem.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -10,10 +11,12 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace BugTrackingSystem.Migrations
 {
-    [DbContext(typeof(DBContext))]
-    partial class DBContextModelSnapshot : ModelSnapshot
+    [DbContext(typeof(ApplicationDBContext))]
+    [Migration("20231231110824_InitialMigration")]
+    partial class InitialMigration
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -31,14 +34,6 @@ namespace BugTrackingSystem.Migrations
                         .IsConcurrencyToken()
                         .HasColumnType("text");
 
-                    b.Property<string>("CreatedProjectId")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("CreatedUserId")
-                        .IsRequired()
-                        .HasColumnType("text");
-
                     b.Property<string>("Description")
                         .HasMaxLength(4000)
                         .HasColumnType("character varying(4000)");
@@ -51,17 +46,18 @@ namespace BugTrackingSystem.Migrations
                         .HasMaxLength(256)
                         .HasColumnType("character varying(256)");
 
+                    b.Property<string>("ProjectId")
+                        .HasColumnType("text");
+
                     b.HasKey("Id");
-
-                    b.HasIndex("CreatedProjectId");
-
-                    b.HasIndex("CreatedUserId");
 
                     b.HasIndex("NormalizedName")
                         .IsUnique()
                         .HasDatabaseName("RoleNameIndex");
 
-                    b.ToTable("AspNetRoles", (string)null);
+                    b.HasIndex("ProjectId");
+
+                    b.ToTable("Role", (string)null);
                 });
 
             modelBuilder.Entity("BugTrackingSystem.Models.Entities.ApplicationUser", b =>
@@ -84,12 +80,10 @@ namespace BugTrackingSystem.Migrations
                         .HasColumnType("boolean");
 
                     b.Property<string>("FirstName")
-                        .IsRequired()
                         .HasMaxLength(32)
                         .HasColumnType("character varying(32)");
 
                     b.Property<string>("LastName")
-                        .IsRequired()
                         .HasMaxLength(32)
                         .HasColumnType("character varying(32)");
 
@@ -129,21 +123,19 @@ namespace BugTrackingSystem.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("NormalizedEmail")
+                        .IsUnique()
                         .HasDatabaseName("EmailIndex");
 
                     b.HasIndex("NormalizedUserName")
                         .IsUnique()
                         .HasDatabaseName("UserNameIndex");
 
-                    b.ToTable("AspNetUsers", (string)null);
+                    b.ToTable("User", (string)null);
                 });
 
             modelBuilder.Entity("BugTrackingSystem.Models.Entities.Bug", b =>
                 {
                     b.Property<string>("Id")
-                        .HasColumnType("text");
-
-                    b.Property<string>("AssignedToId")
                         .HasColumnType("text");
 
                     b.Property<DateTimeOffset>("CreatedDate")
@@ -153,7 +145,7 @@ namespace BugTrackingSystem.Migrations
                         .HasMaxLength(4000)
                         .HasColumnType("character varying(4000)");
 
-                    b.Property<DateTimeOffset>("DueDate")
+                    b.Property<DateTimeOffset?>("DueDate")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<DateTimeOffset>("ModifiedDate")
@@ -190,8 +182,6 @@ namespace BugTrackingSystem.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AssignedToId");
-
                     b.HasIndex("PriorityId");
 
                     b.HasIndex("ProjectId");
@@ -202,7 +192,7 @@ namespace BugTrackingSystem.Migrations
 
                     b.HasIndex("StatusId");
 
-                    b.ToTable("Bugs");
+                    b.ToTable("Bug", (string)null);
                 });
 
             modelBuilder.Entity("BugTrackingSystem.Models.Entities.Permission", b =>
@@ -215,9 +205,14 @@ namespace BugTrackingSystem.Migrations
                         .HasMaxLength(256)
                         .HasColumnType("character varying(256)");
 
+                    b.Property<string>("NormalizedName")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
                     b.HasKey("Id");
 
-                    b.ToTable("Permissions");
+                    b.ToTable("Permission", (string)null);
                 });
 
             modelBuilder.Entity("BugTrackingSystem.Models.Entities.PersonalSpace", b =>
@@ -225,7 +220,7 @@ namespace BugTrackingSystem.Migrations
                     b.Property<string>("Id")
                         .HasColumnType("text");
 
-                    b.Property<string>("SpaceName")
+                    b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(64)
                         .HasColumnType("character varying(64)");
@@ -236,9 +231,10 @@ namespace BugTrackingSystem.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("UserId")
+                        .IsUnique();
 
-                    b.ToTable("PersonalSpaces");
+                    b.ToTable("PersonalSpace", (string)null);
                 });
 
             modelBuilder.Entity("BugTrackingSystem.Models.Entities.Priority", b =>
@@ -253,7 +249,7 @@ namespace BugTrackingSystem.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Priorities");
+                    b.ToTable("Priority", (string)null);
                 });
 
             modelBuilder.Entity("BugTrackingSystem.Models.Entities.Project", b =>
@@ -266,20 +262,20 @@ namespace BugTrackingSystem.Migrations
                         .HasMaxLength(4000)
                         .HasColumnType("character varying(4000)");
 
-                    b.Property<string>("PersonalSpaceId")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("ProjectName")
+                    b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(256)
                         .HasColumnType("character varying(256)");
+
+                    b.Property<string>("PersonalSpaceId")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.HasKey("Id");
 
                     b.HasIndex("PersonalSpaceId");
 
-                    b.ToTable("Projects");
+                    b.ToTable("Project", (string)null);
                 });
 
             modelBuilder.Entity("BugTrackingSystem.Models.Entities.Severity", b =>
@@ -294,7 +290,7 @@ namespace BugTrackingSystem.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Severity");
+                    b.ToTable("Severity", (string)null);
                 });
 
             modelBuilder.Entity("BugTrackingSystem.Models.Entities.Status", b =>
@@ -309,10 +305,10 @@ namespace BugTrackingSystem.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Statuses");
+                    b.ToTable("Status", (string)null);
                 });
 
-            modelBuilder.Entity("BugTrackingSystem.Models.LinkingEntities.ApplicationUserRole", b =>
+            modelBuilder.Entity("BugTrackingSystem.Models.LinkingEntities.ApplicationProjectUserRole", b =>
                 {
                     b.Property<string>("UserId")
                         .HasColumnType("text");
@@ -320,56 +316,46 @@ namespace BugTrackingSystem.Migrations
                     b.Property<string>("RoleId")
                         .HasColumnType("text");
 
-                    b.Property<string>("ApplicationRoleId")
-                        .HasColumnType("text");
-
-                    b.Property<string>("ApplicationUserId")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("CreatedByUserId")
-                        .IsRequired()
-                        .HasColumnType("text");
-
                     b.Property<string>("ProjectId")
-                        .IsRequired()
                         .HasColumnType("text");
 
-                    b.HasKey("UserId", "RoleId");
-
-                    b.HasIndex("ApplicationRoleId");
-
-                    b.HasIndex("ApplicationUserId");
-
-                    b.HasIndex("CreatedByUserId");
+                    b.HasKey("UserId", "RoleId", "ProjectId");
 
                     b.HasIndex("ProjectId");
 
                     b.HasIndex("RoleId");
 
-                    b.ToTable("AspNetUserRoles", (string)null);
+                    b.ToTable("ProjectUserRole", (string)null);
+                });
+
+            modelBuilder.Entity("BugTrackingSystem.Models.LinkingEntities.AssignBugToUser.BugUserAssignation", b =>
+                {
+                    b.Property<string>("BugId")
+                        .HasColumnType("text");
+
+                    b.Property<string>("UserId")
+                        .HasColumnType("text");
+
+                    b.HasKey("BugId", "UserId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("BugUserAssignation", (string)null);
                 });
 
             modelBuilder.Entity("BugTrackingSystem.Models.LinkingEntities.RolePermission", b =>
                 {
-                    b.Property<string>("Id")
+                    b.Property<string>("RoleId")
                         .HasColumnType("text");
 
                     b.Property<string>("PermissionId")
-                        .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("RoleId")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
+                    b.HasKey("RoleId", "PermissionId");
 
                     b.HasIndex("PermissionId");
 
-                    b.HasIndex("RoleId");
-
-                    b.ToTable("PermissionRoles");
+                    b.ToTable("RolePermission", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -394,7 +380,7 @@ namespace BugTrackingSystem.Migrations
 
                     b.HasIndex("RoleId");
 
-                    b.ToTable("AspNetRoleClaims", (string)null);
+                    b.ToTable("RoleClaim", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
@@ -419,18 +405,16 @@ namespace BugTrackingSystem.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("AspNetUserClaims", (string)null);
+                    b.ToTable("UserClaim", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
                 {
                     b.Property<string>("LoginProvider")
-                        .HasMaxLength(128)
-                        .HasColumnType("character varying(128)");
+                        .HasColumnType("text");
 
                     b.Property<string>("ProviderKey")
-                        .HasMaxLength(128)
-                        .HasColumnType("character varying(128)");
+                        .HasColumnType("text");
 
                     b.Property<string>("ProviderDisplayName")
                         .HasColumnType("text");
@@ -443,7 +427,7 @@ namespace BugTrackingSystem.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("AspNetUserLogins", (string)null);
+                    b.ToTable("UserLogin", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
@@ -452,50 +436,32 @@ namespace BugTrackingSystem.Migrations
                         .HasColumnType("text");
 
                     b.Property<string>("LoginProvider")
-                        .HasMaxLength(128)
-                        .HasColumnType("character varying(128)");
+                        .HasColumnType("text");
 
                     b.Property<string>("Name")
-                        .HasMaxLength(128)
-                        .HasColumnType("character varying(128)");
+                        .HasColumnType("text");
 
                     b.Property<string>("Value")
                         .HasColumnType("text");
 
                     b.HasKey("UserId", "LoginProvider", "Name");
 
-                    b.ToTable("AspNetUserTokens", (string)null);
+                    b.ToTable("UserToken", (string)null);
                 });
 
             modelBuilder.Entity("BugTrackingSystem.Models.Entities.ApplicationRole", b =>
                 {
-                    b.HasOne("BugTrackingSystem.Models.Entities.Project", "CreatedProject")
+                    b.HasOne("BugTrackingSystem.Models.Entities.Project", null)
                         .WithMany("CreatedRoles")
-                        .HasForeignKey("CreatedProjectId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("BugTrackingSystem.Models.Entities.ApplicationUser", "CreatedUser")
-                        .WithMany()
-                        .HasForeignKey("CreatedUserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("CreatedProject");
-
-                    b.Navigation("CreatedUser");
+                        .HasForeignKey("ProjectId");
                 });
 
             modelBuilder.Entity("BugTrackingSystem.Models.Entities.Bug", b =>
                 {
-                    b.HasOne("BugTrackingSystem.Models.Entities.ApplicationUser", "AssignedTo")
-                        .WithMany()
-                        .HasForeignKey("AssignedToId");
-
                     b.HasOne("BugTrackingSystem.Models.Entities.Priority", "Priority")
                         .WithMany()
                         .HasForeignKey("PriorityId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("BugTrackingSystem.Models.Entities.Project", "Project")
@@ -507,22 +473,20 @@ namespace BugTrackingSystem.Migrations
                     b.HasOne("BugTrackingSystem.Models.Entities.ApplicationUser", "Reporter")
                         .WithMany()
                         .HasForeignKey("ReporterId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("BugTrackingSystem.Models.Entities.Severity", "Severity")
                         .WithMany()
                         .HasForeignKey("SeverityId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("BugTrackingSystem.Models.Entities.Status", "Status")
                         .WithMany()
                         .HasForeignKey("StatusId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
-
-                    b.Navigation("AssignedTo");
 
                     b.Navigation("Priority");
 
@@ -538,8 +502,8 @@ namespace BugTrackingSystem.Migrations
             modelBuilder.Entity("BugTrackingSystem.Models.Entities.PersonalSpace", b =>
                 {
                     b.HasOne("BugTrackingSystem.Models.Entities.ApplicationUser", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
+                        .WithOne("PersonalSpace")
+                        .HasForeignKey("BugTrackingSystem.Models.Entities.PersonalSpace", "UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -557,53 +521,56 @@ namespace BugTrackingSystem.Migrations
                     b.Navigation("PersonalSpace");
                 });
 
-            modelBuilder.Entity("BugTrackingSystem.Models.LinkingEntities.ApplicationUserRole", b =>
+            modelBuilder.Entity("BugTrackingSystem.Models.LinkingEntities.ApplicationProjectUserRole", b =>
                 {
-                    b.HasOne("BugTrackingSystem.Models.Entities.ApplicationRole", null)
-                        .WithMany("UserRoles")
-                        .HasForeignKey("ApplicationRoleId");
-
-                    b.HasOne("BugTrackingSystem.Models.Entities.ApplicationUser", "ApplicationUser")
-                        .WithMany()
-                        .HasForeignKey("ApplicationUserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("BugTrackingSystem.Models.Entities.ApplicationUser", "CreatedByUser")
-                        .WithMany()
-                        .HasForeignKey("CreatedByUserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("BugTrackingSystem.Models.Entities.Project", "Project")
-                        .WithMany("UserRoles")
+                        .WithMany("ProjectUserRoles")
                         .HasForeignKey("ProjectId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("BugTrackingSystem.Models.Entities.ApplicationRole", null)
-                        .WithMany()
+                    b.HasOne("BugTrackingSystem.Models.Entities.ApplicationRole", "Role")
+                        .WithMany("ProjectUserRoles")
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("BugTrackingSystem.Models.Entities.ApplicationUser", null)
-                        .WithMany()
+                    b.HasOne("BugTrackingSystem.Models.Entities.ApplicationUser", "User")
+                        .WithMany("ProjectUserRoles")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("ApplicationUser");
-
-                    b.Navigation("CreatedByUser");
-
                     b.Navigation("Project");
+
+                    b.Navigation("Role");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("BugTrackingSystem.Models.LinkingEntities.AssignBugToUser.BugUserAssignation", b =>
+                {
+                    b.HasOne("BugTrackingSystem.Models.Entities.Bug", "Bug")
+                        .WithMany("AssignedUsers")
+                        .HasForeignKey("BugId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("BugTrackingSystem.Models.Entities.ApplicationUser", "User")
+                        .WithMany("AssignedBugs")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Bug");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("BugTrackingSystem.Models.LinkingEntities.RolePermission", b =>
                 {
                     b.HasOne("BugTrackingSystem.Models.Entities.Permission", "Permission")
-                        .WithMany()
+                        .WithMany("RolePermissions")
                         .HasForeignKey("PermissionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -657,9 +624,29 @@ namespace BugTrackingSystem.Migrations
 
             modelBuilder.Entity("BugTrackingSystem.Models.Entities.ApplicationRole", b =>
                 {
-                    b.Navigation("RolePermissions");
+                    b.Navigation("ProjectUserRoles");
 
-                    b.Navigation("UserRoles");
+                    b.Navigation("RolePermissions");
+                });
+
+            modelBuilder.Entity("BugTrackingSystem.Models.Entities.ApplicationUser", b =>
+                {
+                    b.Navigation("AssignedBugs");
+
+                    b.Navigation("PersonalSpace")
+                        .IsRequired();
+
+                    b.Navigation("ProjectUserRoles");
+                });
+
+            modelBuilder.Entity("BugTrackingSystem.Models.Entities.Bug", b =>
+                {
+                    b.Navigation("AssignedUsers");
+                });
+
+            modelBuilder.Entity("BugTrackingSystem.Models.Entities.Permission", b =>
+                {
+                    b.Navigation("RolePermissions");
                 });
 
             modelBuilder.Entity("BugTrackingSystem.Models.Entities.PersonalSpace", b =>
@@ -673,7 +660,7 @@ namespace BugTrackingSystem.Migrations
 
                     b.Navigation("CreatedRoles");
 
-                    b.Navigation("UserRoles");
+                    b.Navigation("ProjectUserRoles");
                 });
 #pragma warning restore 612, 618
         }
