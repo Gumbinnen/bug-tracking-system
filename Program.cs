@@ -1,20 +1,34 @@
 using Microsoft.EntityFrameworkCore;
 using BugTrackingSystem.Database;
 using BugTrackingSystem.Models.Entities;
+using Microsoft.AspNetCore.Identity;
 
 var builder = WebApplication.CreateBuilder(args);
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DBContextConnection' not found.");
 
-builder.Services.AddDbContext<DBContext>(options => options.UseNpgsql(connectionString));
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
+                                                                ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 
-builder.Services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = true).AddEntityFrameworkStores<DBContext>();
+#if DEBUG
+connectionString = builder.Configuration.GetConnectionString("DebugConnection") ?? throw new InvalidOperationException("Connection string 'DebugConnection' not found.");
+#endif
 
+builder.Services.AddDbContext<ApplicationDBContext>(options => options.UseNpgsql(connectionString), ServiceLifetime.Scoped);
+
+builder.Services.AddIdentity<ApplicationUser, ApplicationRole>(options => options.SignIn.RequireConfirmedAccount = true)
+                       .AddEntityFrameworkStores<ApplicationDBContext>()
+                       .AddDefaultTokenProviders();
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
 
 var app = builder.Build();
+
+if (args.Length == 1 && args[0].ToLower() == "seed")
+{
+    Seeder.SeedData(app);
+    await Seeder.SeedDataAsync(app);
+}
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
