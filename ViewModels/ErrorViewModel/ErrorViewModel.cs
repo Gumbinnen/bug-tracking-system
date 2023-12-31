@@ -1,4 +1,4 @@
-namespace BugTrackingSystem.Models.ViewModels
+namespace BugTrackingSystem.ViewModels.ErrorViewModel
 {
     public class ErrorViewModel
     {
