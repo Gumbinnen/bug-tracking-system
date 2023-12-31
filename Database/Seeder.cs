@@ -70,7 +70,7 @@ namespace BugTrackingSystem.Database
                 context.PersonalSpaces.AddRange(new List<PersonalSpace>
                 {
                     adminPersonalSpace,
-                    //new PersonalSpace(defaultNonAdminUser.Id, name: "NonAdmin personal space")
+                    new PersonalSpace(defaultNonAdminUser.Id, name: "NonAdmin personal space")
                 });
             }
 
@@ -99,15 +99,7 @@ namespace BugTrackingSystem.Database
             /// Roles
             var roleManager = serviceScope.ServiceProvider.GetRequiredService<RoleManager<ApplicationRole>>();
 
-            var defaultRoles = new List<ApplicationRole>()
-            {
-                new ApplicationRole("Owner"),
-                new ApplicationRole("Administrator"),
-                new ApplicationRole("Manager"),
-                new ApplicationRole("Developer"),
-                new ApplicationRole("QA"),
-                new ApplicationRole("Viewer")
-            };
+            var defaultRoles = DefaultRoles.All;
 
             foreach (var defaultRole in defaultRoles)
             {
