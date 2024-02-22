@@ -1,0 +1,31 @@
+﻿@using BugTrackingSystem.ViewModels.ProjectViewModels
+@{
+    Layout = "~/Views/Project/_ProjectLayout.cshtml";
+}
+
+@model ProjectViewModel
+
+    <table>
+    <caption>Bugs</caption>
+    <tr>
+        <th>Title</th>
+        <th>Великобритания</th>
+        <th>Европа</th>
+        <th>Длина ступни, см</th>
+    </tr>
+    @foreach (var bug in Model.Bugs)
+    {
+        <tr>
+            <td>bug.Title</td><td></td><td>36</td><td>23</td>
+        </tr>
+    }
+    @for (int i = 0; i < 10; i++)
+    {
+        <tr>
+            <td>1</td>
+            <td>2</td>
+            <td>3</td>
+            <td>4</td>
+        </tr>
+    }
+    </table>

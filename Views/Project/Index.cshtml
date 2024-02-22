@@ -1,5 +1,53 @@
 ﻿@{
-    Layout = "~/Views/Shared/_ProjectLayout.cshtml";
+    Layout = "~/Views/Project/_ProjectLayout.cshtml";
 }
+@using BugTrackingSystem.ViewModels.ProjectViewModels
+@model IndexProjectViewModel
+<style>
+    /* Custom CSS for the project grid */
+    .project-container {
+        margin-top: 20px;
+    }
 
-<h1>Project data</h1>
+    .project {
+        background-color: #f0f0f0;
+        border: 1px solid #ddd;
+        padding: 20px;
+        text-align: center;
+    }
+</style>
+
+<div class="container">
+    @if (Model.Projects.Any())
+    {
+        <div class="row project-container">
+            @foreach (var project in Model.Projects)
+            {
+                <div class="col-md-3 col-sm-6">
+                    <div class="project show-project">
+                        @project.Name
+                        <form method="post" asp-controller="Project" asp-action="Project">
+                            <input type="hidden" name="id" value="@project.Id" />
+                            <button type="submit">GO</button>
+                        </form>
+                        <form method="post" asp-controller="Project" asp-action="Details">
+                            <input type="hidden" name="id" value="@project.Id" />
+                            <button type="submit">Info</button>
+                        </form>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div>
+            You don't have any projects. <strong>Create</strong>
+        </div>
+    }
+</div>
+<script>
+    document.getElementById("show-project").addEventListener("click", function () {
+        alert("Div clicked!");
+    });
+</script>
