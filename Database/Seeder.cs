@@ -1,185 +1,124 @@
 ﻿using BugTrackingSystem.Database.DefaultData;
+using BugTrackingSystem.Enums;
+using BugTrackingSystem.Helpers;
+using BugTrackingSystem.Interfaces;
 using BugTrackingSystem.Models.Entities;
-using BugTrackingSystem.Models.LinkingEntities;
-using Microsoft.AspNetCore.Identity;
 
 namespace BugTrackingSystem.Database
 {
     public class Seeder
     {
-        public static void SeedData(IApplicationBuilder applicationBuilder)
-        {
-            using var serviceScope = applicationBuilder.ApplicationServices.CreateScope();
-
-            var context = serviceScope.ServiceProvider.GetService<ApplicationDBContext>()
-                ?? throw new NullReferenceException("ApplicationDBContext shouldn't be null.");
-
-            context.Database.EnsureCreated();
-
-            /// Priorities
-            if (!context.Priorities.Any())
-            {
-                context.Priorities.AddRange(DefaultPriorities.All);
-            }
-
-            /// Severities
-            if (!context.Severities.Any())
-            {
-                context.Severities.AddRange(DefaultSeverities.All);
-            }
-
-            /// Statuses
-            if (!context.Statuses.Any())
-            {
-                context.Statuses.AddRange(DefaultStatuses.All);
-            }
-
-            context.SaveChanges();
-        }
-
         public static async Task SeedDataAsync(IApplicationBuilder applicationBuilder)
         {
-            using var serviceScope = applicationBuilder.ApplicationServices.CreateScope();
+            using var serviceScope = applicationBuilder.ApplicationServices.CreateAsyncScope();
 
             var context = serviceScope.ServiceProvider.GetService<ApplicationDBContext>()
                 ?? throw new NullReferenceException("ApplicationDBContext shouldn't be null.");
 
-            /// Users
-            var userManager = serviceScope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+            await context.Database.EnsureCreatedAsync();
 
-            var defaultAdminUser = DefaultUsers.Admin;
-            var adminUser = userManager.FindByEmailAsync(defaultAdminUser.NormalizedEmail!).Result;
-            if (adminUser == null)
+            var userRepository = serviceScope.ServiceProvider.GetService<IUserRepository>()
+                ?? throw new NullReferenceException("UserRepository shouldn't be null.");
+
+            var projectRepository = serviceScope.ServiceProvider.GetService<IProjectRepository>()
+                ?? throw new NullReferenceException("ProjectRepository shouldn't be null.");
+
+            var permissionRepository = serviceScope.ServiceProvider.GetService<IPermissionRepository>()
+                ?? throw new NullReferenceException("PermissionRepository shouldn't be null.");
+
+            var roleRepository = serviceScope.ServiceProvider.GetService<IRoleRepository>()
+                ?? throw new NullReferenceException("RoleRepository shouldn't be null.");
+
+            /// DEFAULT USERS AND PERSONAL SPACES
+            ///
+
+            var defaultAdminUser = DefaultUserData.Admin;
+            var defaultAdminPassword = DefaultUserData.AdminPassword;
+            var adminUser = await userRepository.GetByIdAsync(defaultAdminUser.Id);
+            if (adminUser is null)
+                await userRepository.CreateAsync(defaultAdminUser, defaultAdminPassword);
+
+            var defaultNonAdminUser = DefaultUserData.NonAdmin;
+            var defaultNonAdminPassword = DefaultUserData.NonAdminPassword;
+            var nonAdminUser = await userRepository.GetByIdAsync(defaultNonAdminUser.Id);
+            if (nonAdminUser is null)
+                await userRepository.CreateAsync(defaultNonAdminUser, defaultNonAdminPassword);
+
+            /// DEFAULT PROJECT
+            /// 
+
+            var project = new Project(defaultAdminUser.PersonalSpace.Id, "Fancy project", "The first ever project in this bug tracker");
+            projectRepository.Add(project);
+
+            /// DEFAULT PERMISSIONS
+            /// 
+
+            var permissionNames = EnumUtility.GetValues<PermissionName>();
+            await permissionRepository.AddRangeAsync(permissionNames);
+
+            /// ROLES
+            /// 
+
+            var projectOwnerRole = await roleRepository.CreateAsync("Project Owner");
+            if (projectOwnerRole != null)
             {
-                await userManager.CreateAsync(defaultAdminUser, DefaultPasswords.AdminPassword);
+                var projectOwnerPermissions = DefaultPermissionSets.All;
+                await roleRepository.AddAsync(projectOwnerRole, projectOwnerPermissions);
             }
 
-            var defaultNonAdminUser = DefaultUsers.NonAdmin;
-            var nonAdminUser = userManager.FindByEmailAsync(defaultNonAdminUser.NormalizedEmail!).Result;
-            if (nonAdminUser == null)
+            var adminRole = await roleRepository.CreateAsync("Administrator");
+            if (adminRole != null)
             {
-                await userManager.CreateAsync(defaultNonAdminUser, DefaultPasswords.NonAdminPassword);
+                var adminPermissions = DefaultPermissionSets.Administrator;
+                await roleRepository.AddAsync(adminRole, adminPermissions);
             }
 
-            /// Personal spaces
-            PersonalSpace? adminPersonalSpace = null;
-            if (!context.PersonalSpaces.Any())
+            var managerRole = await roleRepository.CreateAsync("Manager");
+            if (managerRole != null)
             {
-                adminPersonalSpace = new PersonalSpace(defaultAdminUser.Id, name: "Admin personal space");
-
-                context.PersonalSpaces.AddRange(new List<PersonalSpace>
-                {
-                    adminPersonalSpace,
-                    new PersonalSpace(defaultNonAdminUser.Id, name: "NonAdmin personal space")
-                });
+                var managerPermissions = DefaultPermissionSets.Manager;
+                await roleRepository.AddAsync(managerRole, managerPermissions);
             }
 
-            /// Projects
-            var defaultProject = new Project(adminPersonalSpace!.Id, "Fancy project", description: "The first ever project in this app");
-
-            if (!context.Projects.Any())
+            var developerRole = await roleRepository.CreateAsync("Developer");
+            if (developerRole != null)
             {
-                context.Projects.Add(defaultProject);
+                var developerPermissions = DefaultPermissionSets.Developer;
+                await roleRepository.AddAsync(developerRole, developerPermissions);
             }
 
-            /// Permissions
-            var permissionNames = DefaultPermissionNames.GetAllNames();
-
-            var defaultPermissions = new List<Permission>();
-            foreach (var name in permissionNames)
+            var QARole = await roleRepository.CreateAsync("QA");
+            if (QARole != null)
             {
-                defaultPermissions.Add(new Permission(name));
+                var QAPermissions = DefaultPermissionSets.QA;
+                await roleRepository.AddAsync(QARole, QAPermissions);
             }
 
-            if (!context.Permissions.Any())
+            /// DEFAULT PRIORITIES
+            /// 
+
+            if (!context.Priorities.Any())
             {
-                context.Permissions.AddRange(defaultPermissions);
+                await context.Priorities.AddRangeAsync(DefaultPriorities.All);
             }
 
-            /// Roles
-            var roleManager = serviceScope.ServiceProvider.GetRequiredService<RoleManager<ApplicationRole>>();
+            /// DEFAULT SEVERITIES
+            /// 
 
-            var defaultRoles = DefaultRoles.All;
-
-            foreach (var defaultRole in defaultRoles)
+            if (!context.Severities.Any())
             {
-                var role = roleManager.FindByNameAsync(defaultRole.NormalizedName!).Result;
-                if (role == null)
-                {
-                    await roleManager.CreateAsync(defaultRole);
-
-                    await context.UserRoles.AddAsync(new ApplicationProjectUserRole(defaultProject.Id, defaultAdminUser.Id, defaultRole.Id));
-
-                    /// Assign permissions to roles
-                    var selectedPermissionNames = new List<DefaultPermissionNames.PermissionName>();
-                    switch (defaultRole.Name)
-                    {
-                        case "Owner":
-                            selectedPermissionNames = DefaultPermissionNames.All;
-                            break;
-
-                        case "Administrator":
-                            selectedPermissionNames = DefaultPermissionNames.Administrator;
-                            break;
-
-                        case "Manager":
-                            selectedPermissionNames = DefaultPermissionNames.Manager;
-                            break;
-
-                        case "Developer":
-                            selectedPermissionNames = DefaultPermissionNames.Developer;
-                            break;
-
-                        case "QA":
-                            selectedPermissionNames = DefaultPermissionNames.QA;
-                            break;
-
-                        case "Viewer":
-                            selectedPermissionNames = DefaultPermissionNames.Viewer;
-                            break;
-
-                        default:
-                            break;
-                    }
-
-                    if (selectedPermissionNames.Count > 0)
-                    {
-                        await FiilterAndAssignPermissionsToRole(context, defaultRole, defaultPermissions, selectedPermissionNames);
-                    }
-                }
-            }
-        }
-
-        private static async Task FiilterAndAssignPermissionsToRole(ApplicationDBContext context, ApplicationRole role,
-                                                                                              List<Permission> permissions,
-                                                                                              List<DefaultPermissionNames.PermissionName> targetPermissionNames)
-        {
-            var permissionStringifiedNames = new List<string>();
-            foreach (var permissionName in targetPermissionNames)
-            {
-                var permissionStringifiedName = DefaultPermissionNames.GetNormalizedName(permissionName);
-                if (permissionStringifiedName != null)
-                {
-                    permissionStringifiedNames.Add(permissionStringifiedName);
-                }
+                await context.Severities.AddRangeAsync(DefaultSeverities.All);
             }
 
-            var filteredPermissions = new List<Permission>();
-            foreach (var permission in permissions)
+            /// DEFAULT STATUSES
+            /// 
+
+            if (!context.Statuses.Any())
             {
-                if (permissionStringifiedNames.Contains(permission.NormalizedName))
-                {
-                    filteredPermissions.Add(permission);
-                }
+                await context.Statuses.AddRangeAsync(DefaultStatuses.All);
             }
 
-            foreach (var permission in filteredPermissions)
-            {
-                await context.RolePermissions.AddRangeAsync(new List<RolePermission>()
-                {
-                    new RolePermission(role.Id, permission.Id)
-                });
-            }
+            await context.SaveChangesAsync();
         }
     }
 }
