@@ -1,20 +1,23 @@
-﻿@page "/account/login"
-@using BugTrackingSystem.ViewModels.AccountViewModels;
-@model LoginViewModel
-@{
-    ViewData["Title"] = "Log in";
+﻿@{
     Layout = "~/Views/Account/_AuthLayout.cshtml";
 }
+@using BugTrackingSystem.ViewModels.AccountViewModels;
+@model LoginViewModel
 
-<h1>@ViewData["Title"]</h1>
+<h1>Log In</h1>
+
 <div class="row">
     <div class="col-md-4">
         <section>
-            <form id="account" method="post">
+            <form id="account" asp-action="Login" method="post">
                 <h2>Use a local account to log in.</h2>
                 <hr />
                 <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
                 <div class="form-floating mb-3">
+                    <!--Check for Model Nullability-->
+                    <!--Use a Dummy Model-->
+                    <!--Conditional Rendering with HTML Helpers-->
+                    <!--Or anything else? -->
                     <input asp-for="@Model.Email" class="form-control" autocomplete="username" aria-required="true" placeholder="name@example.com" />
                     <label asp-for="@Model.Email" class="form-label">Email</label>
                     <span asp-validation-for="@Model.Email" class="text-danger"></span>
@@ -33,17 +36,17 @@
                 <div>
                     <button id="login-submit" type="submit" class="w-100 btn btn-lg btn-primary">Log in</button>
                 </div>
-                <div>
-                    <p>
-                        <a id="forgot-password" asp-page="./ForgotPassword">Forgot your password?</a>
-                    </p>
-                    <p>
-                        <a asp-page="./Register" asp-route-returnUrl="@Model.ReturnUrl">Register as a new user</a>
-                    </p>
-                    <p>
-                        <a id="resend-confirmation" asp-page="./ResendEmailConfirmation">Resend email confirmation</a>
-                    </p>
-                </div>
+                @* <div>
+                <p>
+                <a id="forgot-password" asp-page="./ForgotPassword">Forgot your password?</a>
+                </p>
+                <p>
+                <a asp-page="./Register.cshtml" asp-route-returnUrl="@Model.ReturnUrl">Register as a new user</a>
+                </p>
+                <p>
+                <a id="resend-confirmation" asp-page="./ResendEmailConfirmation">Resend email confirmation</a>
+                </p>
+                </div> *@
             </form>
         </section>
     </div>
@@ -52,27 +55,29 @@
             <h3>Use another service to log in.</h3>
             <hr />
             @{
-                if (Model.ExternalLogins.HasAny)
-                {
-                    <div>
-                        <p>
-                            There are no external authentication services configured. See this <a href="https://go.microsoft.com/fwlink/?LinkID=532715">article
-                            about setting up this ASP.NET application to support logging in via external services</a>.
-                        </p>
-                    </div>
-                }
-                else
+                if (Model?.ExternalLogins?.HasAny ?? false)
                 {
                     <form id="external-account" asp-page="./ExternalLogin" asp-route-returnUrl="@Model.ReturnUrl" method="post" class="form-horizontal">
                         <div>
                             <p>
-                                @foreach (var provider in Model.ExternalLogins.Providers!)
+                                @foreach (var provider in Model!.ExternalLogins.Providers)
                                 {
                                     <button type="submit" class="btn btn-primary" name="provider" value="@provider.Name" title="Log in using your @provider.DisplayName account">@provider.DisplayName</button>
                                 }
                             </p>
                         </div>
                     </form>
+                }
+                else
+                {
+                    <div>
+                        <p>
+                            There are no external authentication services configured. See this <a href="https://go.microsoft.com/fwlink/?LinkID=532715">
+                                article
+                                about setting up this ASP.NET application to support logging in via external services
+                            </a>.
+                        </p>
+                    </div>
                 }
             }
         </section>
