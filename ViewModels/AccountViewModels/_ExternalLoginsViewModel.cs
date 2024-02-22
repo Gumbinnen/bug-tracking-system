@@ -2,9 +2,10 @@
 {
     public class ExternalLoginsViewModel
     {
-        public List<ExternalLoginProviderInfo> Providers { get; set; }
 
-        public bool HasAny => Providers?.Count > 0;
+        public List<ExternalLoginProviderInfo> Providers { get; set; } = default!;
+
+        public bool HasAny => Providers.Count > 0;
     }
 
     public class ExternalLoginProviderInfo

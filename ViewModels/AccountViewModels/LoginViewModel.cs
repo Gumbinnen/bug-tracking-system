@@ -15,8 +15,8 @@ namespace BugTrackingSystem.ViewModels.AccountViewModels
         [Display(Name = "Remember me")]
         public bool RememberMe { get; set; }
 
-        public string ReturnUrl { get; set; }
+        public string? ReturnUrl { get; set; }
 
-        public ExternalLoginsViewModel ExternalLogins { get; set; }
+        public ExternalLoginsViewModel? ExternalLogins { get; set; } = default!;
     }
 }
