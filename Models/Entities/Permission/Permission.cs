@@ -1,6 +1,5 @@
 ﻿using BugTrackingSystem.Helpers;
 using BugTrackingSystem.Models.LinkingEntities;
-using Microsoft.AspNetCore.Identity;
 using System.ComponentModel.DataAnnotations;
 
 namespace BugTrackingSystem.Models.Entities
@@ -25,12 +24,12 @@ namespace BugTrackingSystem.Models.Entities
         {
             Id = HashGenerator.GenerateRandomHash();
             Name = name;
-            NormalizedName = NormalizeName(name)!;
+            NormalizedName = NormalizeName(name);
         }
 
-        public static string? NormalizeName(string name)
+        public static string NormalizeName(string name)
         {
-            return name?.Trim().ToUpperInvariant();
+            return name.Trim().ToUpperInvariant().Replace(" ", "_") ?? string.Empty;
         }
 
     }

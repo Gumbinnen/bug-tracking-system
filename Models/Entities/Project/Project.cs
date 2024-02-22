@@ -2,6 +2,7 @@
 using System.ComponentModel.DataAnnotations.Schema;
 using BugTrackingSystem.Helpers;
 using BugTrackingSystem.Models.LinkingEntities;
+using BugTrackingSystem.ViewModels.ProjectViewModels;
 
 namespace BugTrackingSystem.Models.Entities
 {
@@ -17,7 +18,6 @@ namespace BugTrackingSystem.Models.Entities
         [MaxLength(256, ErrorMessage = "Project Name cannot exceed 256 characters.")]
         public string Name { get; set; }
 
-        [Required(ErrorMessage = "Description is required.")]
         [MaxLength(4000, ErrorMessage = "Description cannot exceed 4000 characters.")]
         public string? Description { get; set; }
 
@@ -34,11 +34,22 @@ namespace BugTrackingSystem.Models.Entities
             Id = HashGenerator.GenerateRandomHash();
         }
 
+        public Project(ProjectViewModel projectViewModel) : this()
+        {
+            PersonalSpaceId = projectViewModel.PersonalSpace.Id;
+            Name = projectViewModel.Name;
+            Description = projectViewModel.Description;
+            Bugs = projectViewModel.Bugs.ToList();
+            ProjectUserRoles = projectViewModel.ProjectUserRoles.ToList();
+            CreatedRoles = projectViewModel.CreatedRoles.ToList();
+        }
+
         public Project(string personalSpaceId, string name) : this()
         {
             PersonalSpaceId = personalSpaceId;
             Name = name;
         }
+
         public Project(string personalSpaceId, string name, string description) : this()
         {
             PersonalSpaceId = personalSpaceId;

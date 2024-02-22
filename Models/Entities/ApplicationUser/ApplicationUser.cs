@@ -1,6 +1,7 @@
 ﻿using BugTrackingSystem.Helpers;
 using BugTrackingSystem.Models.LinkingEntities;
 using BugTrackingSystem.Models.LinkingEntities.AssignBugToUser;
+using BugTrackingSystem.ViewModels.AccountViewModels;
 using Microsoft.AspNetCore.Identity;
 using System.ComponentModel.DataAnnotations;
 
@@ -21,16 +22,37 @@ public class ApplicationUser : IdentityUser
     public List<BugUserAssignation> AssignedBugs { get; set; }
     public List<ApplicationProjectUserRole> ProjectUserRoles { get; set; }
 
-    public ApplicationUser()
+    private ApplicationUser()
     {
         Id = HashGenerator.GenerateRandomHash();
     }
-    public ApplicationUser(string email) : this()
+
+    public ApplicationUser(RegisterViewModel model) : this()
+    {
+        Email = model.Email;
+        NormalizedEmail = NormalizeEmail(model.Email);
+        UserName = model.UserName;
+        NormalizedUserName = NormalizeUserName(model.UserName);
+        FirstName = model.FirstName;
+        LastName = model.LastName;
+    }
+
+    public ApplicationUser(string email, string userName) : this()
     {
         Email = email;
         NormalizedEmail = NormalizeEmail(email);
+        UserName = userName;
     }
-    public static string? NormalizeEmail(string email)
+
+    public ApplicationUser(string email, string userName, string firstName) : this()
+    {
+        Email = email;
+        NormalizedEmail = NormalizeEmail(email);
+        UserName = userName;
+        FirstName = firstName;
+    }
+
+    public static string? NormalizeEmail(string? email)
     {
         if (email == null)
         {
@@ -38,5 +60,15 @@ public class ApplicationUser : IdentityUser
         }
 
         return email.Trim().ToUpperInvariant();
+    }
+
+    public static string? NormalizeUserName(string? userName)
+    {
+        if (userName == null)
+        {
+            return null;
+        }
+
+        return userName.Trim().ToUpperInvariant();
     }
 }

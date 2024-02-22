@@ -2,7 +2,6 @@
 using BugTrackingSystem.Models.LinkingEntities;
 using Microsoft.AspNetCore.Identity;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BugTrackingSystem.Models.Entities
 {
