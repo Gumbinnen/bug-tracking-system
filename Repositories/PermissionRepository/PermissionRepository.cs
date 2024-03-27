@@ -48,15 +48,14 @@ namespace BugTrackingSystem.Repositories.PermissionRepository
             return Save();
         }
 
-        public PermissionSetProvider UseDefaultSet()
+        public UserProjectPermissionEvaluation CheckPair(ApplicationUser user, Project project)
         {
-            return new PermissionSetProvider();
+            return new UserProjectPermissionEvaluation(context, user, project);
         }
 
-        public bool Save()
+        public Permission CreateFromName(PermissionName permissionName)
         {
-            int savedRows = context.SaveChanges();
-            return savedRows > 0;
+            return new Permission(permissionName.ToString());
         }
 
         public async Task<bool> ContainsPermissionAsync(IEnumerable<Permission> permissions, PermissionName targetPermissionName)
@@ -88,15 +87,21 @@ namespace BugTrackingSystem.Repositories.PermissionRepository
             return false;
         }
 
-        public Permission CreateFromName(PermissionName permissionName)
-        {
-            return new Permission(permissionName.ToString());
-        }
-
         public async Task<Permission?> GetByNameAsync(PermissionName permissionName)
         {
-            var name = permissionName.ToString();
+            var name = permissionName.ToString().ToUpperInvariant();
             return await context.Permissions.FirstOrDefaultAsync(p => p.NormalizedName == name);
+        }
+
+        public bool Save()
+        {
+            int savedRows = context.SaveChanges();
+            return savedRows > 0;
+        }
+
+        public PermissionSetProvider UseDefaultSet()
+        {
+            return new PermissionSetProvider();
         }
     }
 }

@@ -1,0 +1,16 @@
+﻿@using BugTrackingSystem.ViewModels.ProjectViewModels
+@{
+    Layout = "~/Views/Project/_ProjectLayout.cshtml";
+}
+
+@model DetailsViewModel
+
+<p>@Model.Name
+<p>@Model.Description
+<p>@Model.Creator
+<p>@Model.BugCount
+<p>
+@foreach (var role in Model.CreatedRoles)
+{
+    <br>@role
+}

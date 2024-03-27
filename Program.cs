@@ -8,6 +8,8 @@ using BugTrackingSystem.Repositories.ProjectRepository;
 using BugTrackingSystem.Repositories;
 using BugTrackingSystem.Repositories.PermissionRepository;
 using BugTrackingSystem.Helpers;
+using AutoMapper;
+using BugTrackingSystem.Services.Mapping;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -45,6 +47,7 @@ builder.Services.AddScoped<IRoleRepository, RoleRepository>();
 builder.Services.AddScoped<IBugRepository, BugRepository>();
 builder.Services.AddScoped<IPermissionRepository, PermissionRepository>();
 builder.Services.AddRazorPages();
+builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 var app = builder.Build();
 

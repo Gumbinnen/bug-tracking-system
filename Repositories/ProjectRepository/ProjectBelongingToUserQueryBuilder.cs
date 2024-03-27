@@ -4,12 +4,12 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BugTrackingSystem.Repositories.ProjectRepository
 {
-    public class ProjectByUserQueryBuilder
+    public class ProjectBelongingToUserQueryBuilder
     {
         private readonly ApplicationDBContext context;
         private readonly PersonalSpace personalSpace;
 
-        public ProjectByUserQueryBuilder(ApplicationDBContext context, ApplicationUser user)
+        public ProjectBelongingToUserQueryBuilder(ApplicationDBContext context, ApplicationUser user)
         {
             this.context = context;
             personalSpace = user.PersonalSpace;

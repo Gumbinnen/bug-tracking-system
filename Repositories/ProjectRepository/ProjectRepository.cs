@@ -13,14 +13,9 @@ namespace BugTrackingSystem.Repositories.ProjectRepository
             this.context = context;
         }
 
-        public ProjectByUserQueryBuilder BelongingToUser(ApplicationUser user)
+        public ProjectAccessibleToUserQueryBuilder AccessibleToUser(ApplicationUser user)
         {
-            return new ProjectByUserQueryBuilder(context, user);
-        }
-
-        public WithProjectQueryBuilder WithProject(Project project)
-        {
-            return new WithProjectQueryBuilder(context, project);
+            return new ProjectAccessibleToUserQueryBuilder(context, user);
         }
 
         public bool Add(Project project)
@@ -29,10 +24,9 @@ namespace BugTrackingSystem.Repositories.ProjectRepository
             return Save();
         }
 
-        public bool Update(Project project)
+        public ProjectBelongingToUserQueryBuilder BelongingToUser(ApplicationUser user)
         {
-            context.Update(project);
-            return Save();
+            return new ProjectBelongingToUserQueryBuilder(context, user);
         }
 
         public bool Delete(Project project)
@@ -45,6 +39,12 @@ namespace BugTrackingSystem.Repositories.ProjectRepository
         {
             int savedCount = context.SaveChanges();
             return savedCount > 0;
+        }
+
+        public bool Update(Project project)
+        {
+            context.Update(project);
+            return Save();
         }
     }
 }

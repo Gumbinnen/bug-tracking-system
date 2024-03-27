@@ -5,9 +5,9 @@ namespace BugTrackingSystem.Interfaces
 {
     public interface IProjectRepository
     {
-        ProjectByUserQueryBuilder BelongingToUser(ApplicationUser user);
+        ProjectBelongingToUserQueryBuilder BelongingToUser(ApplicationUser user);
 
-        WithProjectQueryBuilder WithProject(Project project);
+        ProjectAccessibleToUserQueryBuilder AccessibleToUser(ApplicationUser user);
 
         bool Add(Project project);
 

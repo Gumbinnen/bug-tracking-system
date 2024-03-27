@@ -34,16 +34,6 @@ namespace BugTrackingSystem.Models.Entities
             Id = HashGenerator.GenerateRandomHash();
         }
 
-        public Project(ProjectViewModel projectViewModel) : this()
-        {
-            PersonalSpaceId = projectViewModel.PersonalSpace.Id;
-            Name = projectViewModel.Name;
-            Description = projectViewModel.Description;
-            Bugs = projectViewModel.Bugs.ToList();
-            ProjectUserRoles = projectViewModel.ProjectUserRoles.ToList();
-            CreatedRoles = projectViewModel.CreatedRoles.ToList();
-        }
-
         public Project(string personalSpaceId, string name) : this()
         {
             PersonalSpaceId = personalSpaceId;

@@ -12,7 +12,7 @@ namespace BugTrackingSystem.Interfaces
 
         Task<bool> AddRangeAsync(IEnumerable<PermissionName> permissionNames);
 
-        PermissionSetProvider UseDefaultSet();
+        UserProjectPermissionEvaluation CheckPair(ApplicationUser user, Project project); 
 
         Task<bool> ContainsPermissionAsync(IEnumerable<Permission> permissions, PermissionName targetPermissionName);
 
@@ -25,5 +25,7 @@ namespace BugTrackingSystem.Interfaces
         Task<Permission?> GetByNameAsync(PermissionName permissionName);
 
         bool Save();
+
+        PermissionSetProvider UseDefaultSet();
     }
 }

@@ -1,9 +1,11 @@
-﻿using BugTrackingSystem.Enums;
+﻿using AutoMapper;
+using BugTrackingSystem.Enums;
 using BugTrackingSystem.Interfaces;
 using BugTrackingSystem.Models.Entities;
 using BugTrackingSystem.ViewModels.ProjectViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Data.Entity.Core;
 
 namespace BugTrackingSystem.Controllers
 {
@@ -12,25 +14,31 @@ namespace BugTrackingSystem.Controllers
         private readonly IProjectRepository projectRepository;
         private readonly IUserRepository userRepository;
         private readonly IPermissionRepository permissionRepository;
+        private readonly IMapper mapper;
 
-        public ProjectController(IProjectRepository projectRepository, IUserRepository userRepository, IPermissionRepository permissionRepository)
+        public ProjectController(
+            IProjectRepository projectRepository,
+            IUserRepository userRepository,
+            IPermissionRepository permissionRepository,
+            IMapper mapper)
         {
             this.projectRepository = projectRepository;
             this.userRepository = userRepository;
             this.permissionRepository = permissionRepository;
+            this.mapper = mapper;
         }
 
         // GET: ProjectController
         [Authorize()]
         public async Task<ActionResult> Index()
         {
-            var authenticationResult = HandleAuthentication();
-            if (authenticationResult != null)
+            var authenticationErrorResult = this.HandleAuthentication();
+            if (authenticationErrorResult != null)
             {
-                return authenticationResult;
+                return authenticationErrorResult;
             }
 
-            ApplicationUser? user = await userRepository.GetAsync(User);
+            var user = await userRepository.GetAsync(User);
 
             if (user == null)
             {
@@ -44,15 +52,15 @@ namespace BugTrackingSystem.Controllers
             return View(indexProjectVM);
         }
 
-        public async Task<ActionResult> Project(string id)
+        public async Task<ActionResult> Project(string id) // Belonging and Accessible handle partly
         {
-            var authenticationResult = HandleAuthentication();
-            if (authenticationResult != null)
+            var authenticationErrorResult = this.HandleAuthentication();
+            if (authenticationErrorResult != null)
             {
-                return authenticationResult;
+                return authenticationErrorResult;
             }
 
-            ApplicationUser? user = await userRepository.GetAsync(User);
+            var user = await userRepository.GetAsync(User);
 
             if (user == null)
             {
@@ -66,17 +74,17 @@ namespace BugTrackingSystem.Controllers
                 throw new NotImplementedException("Not implemented when project is null.");
             }
 
-            var projectVM = new ProjectViewModel(project);
+            var projectVM = mapper.Map<ProjectViewModel>(project);
 
             return View(projectVM);
         }
 
-        public async Task<ActionResult> Details(ProjectViewModel projectVM)
+        public async Task<ActionResult> Details(string id)
         {
-            var authenticationResult = HandleAuthentication();
-            if (authenticationResult != null)
+            var authenticationErrorResult = this.HandleAuthentication();
+            if (authenticationErrorResult != null)
             {
-                return authenticationResult;
+                return authenticationErrorResult;
             }
 
             var user = await userRepository.GetAsync(User);
@@ -86,18 +94,26 @@ namespace BugTrackingSystem.Controllers
                 throw new NotImplementedException("Not implemented when user is null.");
             }
 
-            var project = new Project(projectVM);
+            var project = await projectRepository.AccessibleToUser(user).GetByIdAsync(id);
 
-            var userPermissions = await projectRepository.WithProject(project).ForUser(user).GetPermissions();
+            if (project == null)
+            {
+                throw new NotImplementedException("Not implemented when project is null.");
+            }
 
-            bool canViewProjectDetails = await permissionRepository.ContainsPermissionAsync(userPermissions, PermissionName.PROJECT_VIEW_DETAILS); //?
+            var permission = await permissionRepository.GetByNameAsync(PermissionName.PROJECT_VIEW_DETAILS)
+                                                    ?? throw new ObjectNotFoundException("Permission object not found, but it was expected to exist.");
 
-            if (!canViewProjectDetails)
+            bool canViewDetails = await permissionRepository.CheckPair(user, project).HasPermission(permission);
+
+            if (!canViewDetails)
             {
                 throw new NotImplementedException("Not implemented when user is not permitted to view project details.");
             }
 
-            return View(project);
+            var projectVM = mapper.Map<DetailsViewModel>(project);
+
+            return View(projectVM);
         }
 
         // GET: ProjectController/Create
@@ -163,6 +179,12 @@ namespace BugTrackingSystem.Controllers
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns>
+        /// <see langword="null" /> if the user is authenticated; otherwise, an <see cref="ActionResult" />.
+        /// </returns>
         private ActionResult? HandleAuthentication()
         {
             var userIdentity = User.Identity;
@@ -182,6 +204,8 @@ namespace BugTrackingSystem.Controllers
                     //return RedirectToAction("Login", "Account");
                 }
             }
+
+            // TODO: authentication handler here.
 
             // User authenticated
             return null;
