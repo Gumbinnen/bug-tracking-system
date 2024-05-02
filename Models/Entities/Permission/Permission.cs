@@ -1,4 +1,5 @@
-﻿using BugTrackingSystem.Helpers;
+﻿using BugTrackingSystem.Enums.PermissionType;
+using BugTrackingSystem.Helpers;
 using BugTrackingSystem.Models.LinkingEntities;
 using System.ComponentModel.DataAnnotations;
 
@@ -8,6 +9,10 @@ namespace BugTrackingSystem.Models.Entities
     {
         [Key]
         public string Id { get; private set; }
+
+        public PermissionType Type { get; set; }
+
+        public int SubTypeValue { get; set; }
 
         [Required(ErrorMessage = "Name is required.")]
         [StringLength(256, ErrorMessage = "Name cannot exceed 256 characters.")]
@@ -20,9 +25,11 @@ namespace BugTrackingSystem.Models.Entities
         // Navigation properties
         public List<RolePermission> RolePermissions { get; set; }
 
-        public Permission(string name)
+        public Permission(PermissionType type, int subTypeValue, string name)
         {
             Id = HashGenerator.GenerateRandomHash();
+            Type = type;
+            SubTypeValue = subTypeValue;
             Name = name;
             NormalizedName = NormalizeName(name);
         }

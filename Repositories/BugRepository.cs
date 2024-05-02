@@ -1,9 +1,9 @@
 ﻿using BugTrackingSystem.Database;
-using BugTrackingSystem.Interfaces;
+using BugTrackingSystem.Interfaces.Repository;
 
 namespace BugTrackingSystem.Repositories
 {
-    public class BugRepository : IBugRepository
+    public sealed class BugRepository : IBugRepository
     {
         private readonly ApplicationDBContext context;
         public BugRepository(ApplicationDBContext context)

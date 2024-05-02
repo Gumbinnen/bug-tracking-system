@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BugTrackingSystem.Repositories.ProjectRepository
 {
-    public class ProjectBelongingToUserQueryBuilder
+    public sealed class ProjectBelongingToUserQueryBuilder
     {
         private readonly ApplicationDBContext context;
         private readonly PersonalSpace personalSpace;
@@ -12,7 +12,8 @@ namespace BugTrackingSystem.Repositories.ProjectRepository
         public ProjectBelongingToUserQueryBuilder(ApplicationDBContext context, ApplicationUser user)
         {
             this.context = context;
-            personalSpace = user.PersonalSpace;
+            personalSpace = user.PersonalSpace ??
+                throw new NullReferenceException("user.PersonalSpace shouldn't be null but happend to be.");
         }
 
         public async Task<IEnumerable<Project>> GetAllAsync()

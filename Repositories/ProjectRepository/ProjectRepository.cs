@@ -1,10 +1,11 @@
 ﻿using BugTrackingSystem.Database;
-using BugTrackingSystem.Interfaces;
+using BugTrackingSystem.Interfaces.Repository;
 using BugTrackingSystem.Models.Entities;
+using System.ComponentModel;
 
 namespace BugTrackingSystem.Repositories.ProjectRepository
 {
-    public class ProjectRepository : IProjectRepository
+    public sealed class ProjectRepository : IProjectRepository
     {
         private readonly ApplicationDBContext context;
 

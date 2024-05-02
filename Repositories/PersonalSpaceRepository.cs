@@ -1,11 +1,11 @@
 ﻿using BugTrackingSystem.Database;
-using BugTrackingSystem.Interfaces;
+using BugTrackingSystem.Interfaces.Repository;
 using BugTrackingSystem.Models.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace BugTrackingSystem.Repositories
 {
-    public class PersonalSpaceRepository : IPersonalSpaceRepository
+    public sealed class PersonalSpaceRepository : IPersonalSpaceRepository
     {
         private readonly ApplicationDBContext context;
 

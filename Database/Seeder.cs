@@ -1,7 +1,7 @@
 ﻿using BugTrackingSystem.Database.DefaultData;
 using BugTrackingSystem.Enums;
 using BugTrackingSystem.Helpers;
-using BugTrackingSystem.Interfaces;
+using BugTrackingSystem.Interfaces.Repository;
 using BugTrackingSystem.Models.Entities;
 
 namespace BugTrackingSystem.Database

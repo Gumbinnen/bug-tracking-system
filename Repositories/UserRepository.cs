@@ -1,6 +1,6 @@
 ﻿using BugTrackingSystem.Database;
 using BugTrackingSystem.Helpers;
-using BugTrackingSystem.Interfaces;
+using BugTrackingSystem.Interfaces.Repository;
 using BugTrackingSystem.Models.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -8,7 +8,7 @@ using System.Security.Claims;
 
 namespace BugTrackingSystem.Repositories
 {
-    public class UserRepository : IUserRepository
+    public sealed class UserRepository : IUserRepository
     {
         private readonly ApplicationDBContext context;
         private readonly UserManager<ApplicationUser> userManager;

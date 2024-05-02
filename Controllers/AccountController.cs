@@ -1,5 +1,5 @@
 ﻿using BugTrackingSystem.Database;
-using BugTrackingSystem.Interfaces;
+using BugTrackingSystem.Interfaces.Repository;
 using BugTrackingSystem.Models.Entities;
 using BugTrackingSystem.Repositories;
 using BugTrackingSystem.ViewModels.AccountViewModels;

@@ -2,14 +2,12 @@ using Microsoft.EntityFrameworkCore;
 using BugTrackingSystem.Database;
 using BugTrackingSystem.Models.Entities;
 using Microsoft.AspNetCore.Identity;
-using BugTrackingSystem.Interfaces;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using BugTrackingSystem.Repositories.ProjectRepository;
 using BugTrackingSystem.Repositories;
 using BugTrackingSystem.Repositories.PermissionRepository;
 using BugTrackingSystem.Helpers;
-using AutoMapper;
-using BugTrackingSystem.Services.Mapping;
+using BugTrackingSystem.Interfaces.Repository;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -22,6 +20,7 @@ connectionString = builder.Configuration.GetConnectionString("DebugConnection")
 #endif
 
 builder.Services.AddDbContext<ApplicationDBContext>(options => options.UseNpgsql(connectionString), ServiceLifetime.Scoped);
+builder.Services.AddTransient<DapperDBContext>(_ => new(connectionString));
 
 builder.Services.AddIdentity<ApplicationUser, ApplicationRole>(options => options.SignIn.RequireConfirmedAccount = true)
                        .AddEntityFrameworkStores<ApplicationDBContext>()

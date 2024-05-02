@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BugTrackingSystem.Repositories.ProjectRepository
 {
-    public class ProjectAccessibleToUserQueryBuilder
+    public sealed class ProjectAccessibleToUserQueryBuilder
     {
         private readonly ApplicationDBContext context;
         private readonly ApplicationUser user;
@@ -18,6 +18,7 @@ namespace BugTrackingSystem.Repositories.ProjectRepository
         public async Task<IEnumerable<Project>> GetAllAsync()
         {
             return await context.UserRoles.Where(pur => pur.UserId == user.Id).Select(pur => pur.Project).ToListAsync();
+
         }
 
         public async Task<Project?> GetByIdAsync(string id)

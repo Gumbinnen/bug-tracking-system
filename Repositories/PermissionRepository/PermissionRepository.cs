@@ -1,29 +1,32 @@
 ﻿using BugTrackingSystem.Database;
 using BugTrackingSystem.Enums;
-using BugTrackingSystem.Interfaces;
+using BugTrackingSystem.Interfaces.Repository;
 using BugTrackingSystem.Models.Entities;
+using Dapper;
 using Microsoft.EntityFrameworkCore;
 
 namespace BugTrackingSystem.Repositories.PermissionRepository
 {
-    public class PermissionRepository : IPermissionRepository
+    public sealed class PermissionRepository : IPermissionRepository
     {
-        private readonly ApplicationDBContext context;
+        private readonly ApplicationDBContext _context;
+        private readonly DapperDBContext _dapperContext;
 
-        public PermissionRepository(ApplicationDBContext context)
+        public PermissionRepository(ApplicationDBContext context, DapperDBContext dapperContext)
         {
-            this.context = context;
+            this._context = context;
+            this._dapperContext = dapperContext;
         }
 
         public async Task<bool> AddAsync(Permission permission)
         {
-            await context.Permissions.AddAsync(permission);
+            await _context.Permissions.AddAsync(permission);
             return Save();
         }
 
         public async Task<bool> AddRangeAsync(IEnumerable<Permission> permissions)
         {
-            await context.Permissions.AddRangeAsync(permissions);
+            await _context.Permissions.AddRangeAsync(permissions);
             return Save();
         }
 
@@ -44,13 +47,25 @@ namespace BugTrackingSystem.Repositories.PermissionRepository
                 throw new NullReferenceException("IEnumerable<PermissionName> item shouldn't contain null.", ex);
             }
 
-            await context.Permissions.AddRangeAsync(permissions);
+            await _context.Permissions.AddRangeAsync(permissions);
             return Save();
         }
 
-        public UserProjectPermissionEvaluation CheckPair(ApplicationUser user, Project project)
+        public async Task<PermissionResult> CheckPairAsync(ApplicationUser user, Project project)
         {
-            return new UserProjectPermissionEvaluation(context, user, project);
+            var sql = @"SELECT p.Type, p.Value
+                            FROM Permissions p
+                            INNER JOIN RolePermissions rp ON p.Id = rp.PermissionId
+                            INNER JOIN ProjectUserRoles pur ON rp.RoleId = pur.RoleId
+                            WHERE pur.ProjectId = @ProjectId AND pur.UserId = @UserId";
+
+            IEnumerable<Permission> permissions;
+            using (var connection = _dapperContext.Connection)
+            {
+                connection.Open();
+                permissions = await connection.QueryAsync<Permission>(sql, new { ProjectId = project.Id, UserId = user.Id });
+            }
+            return new PermissionResult(permissions.ToList());
         }
 
         public Permission CreateFromName(PermissionName permissionName)
@@ -72,7 +87,7 @@ namespace BugTrackingSystem.Repositories.PermissionRepository
 
         public async Task<bool> ContainsPermissionAsync(ApplicationRole role, Permission permission)
         {
-            return await context.RolePermissions.Where(rp => rp.RoleId == role.Id & rp.PermissionId == permission.Id).AnyAsync();
+            return await _context.RolePermissions.Where(rp => rp.RoleId == role.Id & rp.PermissionId == permission.Id).AnyAsync();
         }
 
         public async Task<bool> ContainsPermissionAsync(IEnumerable<ApplicationRole> roles, Permission permission)
@@ -80,7 +95,7 @@ namespace BugTrackingSystem.Repositories.PermissionRepository
             bool IsPermissionFoundInRole = false;
             foreach (var role in roles)
             {
-                IsPermissionFoundInRole = await context.RolePermissions.Where(rp => rp.RoleId == role.Id & rp.PermissionId == permission.Id).AnyAsync();
+                IsPermissionFoundInRole = await _context.RolePermissions.Where(rp => rp.RoleId == role.Id & rp.PermissionId == permission.Id).AnyAsync();
                 if (IsPermissionFoundInRole)
                     return true;
             }
@@ -90,12 +105,12 @@ namespace BugTrackingSystem.Repositories.PermissionRepository
         public async Task<Permission?> GetByNameAsync(PermissionName permissionName)
         {
             var name = permissionName.ToString().ToUpperInvariant();
-            return await context.Permissions.FirstOrDefaultAsync(p => p.NormalizedName == name);
+            return await _context.Permissions.FirstOrDefaultAsync(p => p.NormalizedName == name);
         }
 
         public bool Save()
         {
-            int savedRows = context.SaveChanges();
+            int savedRows = _context.SaveChanges();
             return savedRows > 0;
         }
 

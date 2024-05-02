@@ -1,10 +1,13 @@
 ﻿using AutoMapper;
 using BugTrackingSystem.Enums;
-using BugTrackingSystem.Interfaces;
+using BugTrackingSystem.Enums.PermissionType;
+using BugTrackingSystem.Interfaces.Repository;
 using BugTrackingSystem.Models.Entities;
+using BugTrackingSystem.Models.Entities.Permission;
 using BugTrackingSystem.ViewModels.ProjectViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Build.Construction;
 using System.Data.Entity.Core;
 
 namespace BugTrackingSystem.Controllers
@@ -30,7 +33,7 @@ namespace BugTrackingSystem.Controllers
 
         // GET: ProjectController
         [Authorize()]
-        public async Task<ActionResult> Index()
+        public async Task<ActionResult> AllProjects()
         {
             var authenticationErrorResult = this.HandleAuthentication();
             if (authenticationErrorResult != null)
@@ -47,12 +50,78 @@ namespace BugTrackingSystem.Controllers
 
             var projects = await projectRepository.BelongingToUser(user).GetAllAsync();
 
-            var indexProjectVM = new IndexProjectViewModel(projects);
+            var allProjectVM = mapper.Map<IndexProjectViewModel>(projects);
 
-            return View(indexProjectVM);
+            if (allProjectVM == null)
+            {
+                throw new NotImplementedException("Not implemented when allProjectVM is null.");
+            }
+
+            return View("Index", allProjectVM);
         }
 
-        public async Task<ActionResult> Project(string id) // Belonging and Accessible handle partly
+        [Authorize()]
+        public async Task<ActionResult> AccessibleProjects()
+        {
+            //TODO: middleware auth
+
+            var user = await userRepository.GetAsync(User);
+
+            if (user == null)
+            {
+                throw new NotImplementedException("Not implemented when user is null.");
+            }
+
+            var projects = await projectRepository.AccessibleToUser(user).GetAllAsync();
+
+            if (!projects.Any())
+            {
+                throw new NotImplementedException("Not implemented when project count is zero.");
+            }
+
+            var accessibleProjectVM = mapper.Map<IndexProjectViewModel>(projects);
+
+            if (accessibleProjectVM == null)
+            {
+                throw new NotImplementedException("Not implemented when accessibleProjectVM is null.");
+            }
+
+            return View("Index", accessibleProjectVM);
+        }
+
+        [Authorize()]
+        public async Task<ActionResult> OwnedProjects()
+        {
+            // middleware auth
+
+            var user = await userRepository.GetAsync(User);
+
+            if (user == null)
+            {
+                throw new NotImplementedException("Not implemented when user is null.");
+            }
+
+            var projects = await projectRepository.BelongingToUser(user).GetAllAsync();
+
+            if (!projects.Any())
+            {
+                throw new NotImplementedException("Not implemented when project count is zero.");
+            }
+
+            var ownedProjectVM = mapper.Map<IndexProjectViewModel>(projects);
+
+            if (ownedProjectVM == null)
+            {
+                throw new NotImplementedException("Not implemented when ownedProjectVM is null.");
+            }
+
+            return View("Index", ownedProjectVM);
+        }
+
+
+        [Authorize()] //!!!!!!!!!!! instead of HandleAuthentication();
+                            // also midleware customization. Login page instead of 401 Unautorized
+        public async Task<ActionResult> Project(string id) // Belonging and Accessible handle partly. PROJECTS!!!!!!! NOT PROJECT
         {
             var authenticationErrorResult = this.HandleAuthentication();
             if (authenticationErrorResult != null)
@@ -67,7 +136,7 @@ namespace BugTrackingSystem.Controllers
                 throw new NotImplementedException("Not implemented when user is null.");
             }
 
-            var project = await projectRepository.BelongingToUser(user).GetByIdAsync(id);
+            var project = await projectRepository.AccessibleToUser(user).GetByIdAsync(id);
 
             if (project == null)
             {
@@ -75,6 +144,11 @@ namespace BugTrackingSystem.Controllers
             }
 
             var projectVM = mapper.Map<ProjectViewModel>(project);
+
+            if (projectVM == null)
+            {
+                throw new NotImplementedException("Not implemented when projectVM is null.");
+            }
 
             return View(projectVM);
         }
@@ -101,9 +175,7 @@ namespace BugTrackingSystem.Controllers
                 throw new NotImplementedException("Not implemented when project is null.");
             }
 
-            var permission = await permissionRepository.GetByNameAsync(PermissionName.PROJECT_VIEW_DETAILS)
-                                                    ?? throw new ObjectNotFoundException("Permission object not found, but it was expected to exist.");
-
+            var permission = new ProjectPermission(ProjectPermissionType.ViewDetails);
             bool canViewDetails = await permissionRepository.CheckPair(user, project).HasPermission(permission);
 
             if (!canViewDetails)
@@ -112,6 +184,11 @@ namespace BugTrackingSystem.Controllers
             }
 
             var projectVM = mapper.Map<DetailsViewModel>(project);
+
+            if (projectVM == null)
+            {
+                throw new NotImplementedException("Not implemented when projectVM is null.");
+            }
 
             return View(projectVM);
         }
@@ -129,7 +206,7 @@ namespace BugTrackingSystem.Controllers
         {
             try
             {
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(AllProjects));
             }
             catch
             {
@@ -150,7 +227,7 @@ namespace BugTrackingSystem.Controllers
         {
             try
             {
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(AllProjects));
             }
             catch
             {
@@ -171,7 +248,7 @@ namespace BugTrackingSystem.Controllers
         {
             try
             {
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(AllProjects));
             }
             catch
             {

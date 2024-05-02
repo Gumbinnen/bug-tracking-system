@@ -1,12 +1,14 @@
 ﻿using BugTrackingSystem.Database;
 using BugTrackingSystem.Enums;
-using BugTrackingSystem.Interfaces;
+using BugTrackingSystem.Interfaces.Repository;
 using BugTrackingSystem.Models.Entities;
 using BugTrackingSystem.Models.LinkingEntities;
+using Microsoft.AspNetCore.Authorization.Infrastructure;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace BugTrackingSystem.Repositories
 {
-    public class RoleRepository : IRoleRepository
+    public sealed class RoleRepository : IRoleRepository
     {
         private readonly ApplicationDBContext context;
         private readonly IPermissionRepository permissionRepository;
